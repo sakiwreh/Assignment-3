@@ -1,40 +1,39 @@
 import { useEffect, useState } from "react";
 
 function ProductListing(){
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
-    // Define an async function to fetch data
-    const fetchData = async () => {
-      try {
-        const response = await fetch("https://dummyjson.com/products");
-
-        // Check if the response is OK (status 200–299)
+  useEffect(() => {
+    fetch("https://dummyjson.com/products")
+      .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
-        const data = await response.json(); // Parse JSON
-        console.log("Fetched Data:", data.products); // Log to console
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData(); // Call the async function
+        return response.json();
+      })
+      .then((json) => {
+        console.log("Fetched Data:", json);
+        setData(json);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Fetch error:", err);
+        setError(err.message);
+        setLoading(false);
+      });
   }, []);
 
-    return(
-        <>
-                <h1>Product List</h1>
-                        <p>Title</p>
-                        <p>Description</p>
-                        <p>Category</p>
-                        <p>Price</p>
-        </>
-    )
+  if (loading) return <p>Loading data...</p>;
+  if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
+
+  return (
+    <div style={{ padding: "20px" }}>
+      
+    </div>
+  );
 }
+
 
 export default ProductListing;

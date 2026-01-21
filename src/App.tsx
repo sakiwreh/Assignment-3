@@ -7,6 +7,7 @@ import ProductDetails from './components/ProductDetails'
 import ProductForm from './components/ProductForm'
 import Stats from './components/Stats'
 import ProductListing from './components/ProductListing'
+import ProductCard from './components/ProductCard'
 
 interface Product{
   id:number;
@@ -62,6 +63,7 @@ function App() {
         }
         </ul>
         <ProductListing/>
+        {/* <ProductCard/> */}
       </div>
     </>
   )
