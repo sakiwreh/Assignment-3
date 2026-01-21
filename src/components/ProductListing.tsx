@@ -1,36 +1,116 @@
 import { useEffect, useState } from "react";
+import ProductCard from "./ProductCard";
+
+interface Product{
+        id: number;
+        title:string;
+        price:number;
+        category:string;
+    };
 
 function ProductListing(){
-  const [data, setData] = useState([]);
+  const [Products, setProducts] = useState([]);
+  const [Categories, setCategories] = useState([]);
+  //const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetch("https://dummyjson.com/products")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((json) => {
-        console.log("Fetched Data:", json);
-        setData(json);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Fetch error:", err);
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
+  const [searchQuery,setSearchQuery] = useState<string>("");
+  const [selectedCategory,setSelectedCategory] = useState<string>("All");
 
-  if (loading) return <p>Loading data...</p>;
-  if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
+  useEffect(()=>{
+    fetch("https://dummyjson.com/products/category-list")
+    .then((res)=>res.json())
+    .then((data)=>setCategories(data))
+    .catch((err)=>console.error("Error"));
+  },[]);
+
+  useEffect(()=>{
+    fetchData();
+  },[searchQuery,selectedCategory]);
+
+  const fetchData = async () =>{
+    setLoading(true);
+    setError(null);
+
+    try{
+      let url = "https://dummyjson.com/products"
+
+      if(searchQuery.trim().length > 0){
+        url = `https://dummyjson.com/products/search?q=${searchQuery}`;
+      }else if(selectedCategory !== "All"){
+        url = `https://dummyjson.com/products/category/${selectedCategory}`;
+      }
+
+      const response = await fetch(url);
+
+      if(!response.ok){
+        throw new Error("HTTP Error")
+      }
+
+      const json = await response.json();
+
+      if(json.products){
+        setProducts(json.products)
+      }else{
+        setProducts([]);
+      }
+    }catch(err:any){
+      console.error("Fetch error");
+    }finally{
+      setLoading(false);
+    }
+  };
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>)=>{
+    setSelectedCategory(e.target.value);
+    setSearchQuery("");
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>)=>{
+    setSearchQuery(e.target.value);
+    if(e.target.value !== "")setSelectedCategory("All");
+  };
+
+  if(error){
+    return(
+      <div>Error:{error}</div>
+    )
+  }
 
   return (
-    <div style={{ padding: "20px" }}>
-      
+    <div>
+      <h1>Product Catalog</h1>
+
+      <div>
+        <input type="text" placeholder="Search Products" value={searchQuery} onChange={handleSearchChange}/>
+        <select name="" value={selectedCategory} onChange={handleCategoryChange}>
+          <option value="All">All Categories</option>
+          {Categories.map((cat)=>(
+            <option value={cat}>{cat}</option>
+          ))}
+        </select>
+      </div>
+
+      {loading?(
+        <div>
+          <p>Loading data...</p>
+        </div>
+      ):(
+        <>
+          {Products.length === 0 ? (
+            <div>
+              <p>No products found</p>
+            </div>
+          ):(
+            <div>
+              {Products.map((item)=>(
+                <ProductCard product={item}/>
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

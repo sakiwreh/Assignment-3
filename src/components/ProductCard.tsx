@@ -1,16 +1,23 @@
 interface ProductDetailsProps{
-    title:string;
-    description:string;
-    price:number;
+    product:{
+        id: number;
+        title:string;
+        price:number;
+        category:string;
+    };
 }
 
-function ProductCard({title, description, price}:ProductDetailsProps){
+function ProductCard({ product }:ProductDetailsProps){
     return(
         <>
-            <div className="grid items-start grid-cols-1 lg:grid-cols-2 gap-8 max-lg:gap-12 max-sm:gap-8 border-5 p-3 m-2 w-125">
-                <h3 className="text-lg sm:text-xl text-gray-900 dark:bg-gray-400">{title}</h3>
-                                <p className="text-sm mt-1 text-gray-500">{description}</p>
-                <h4>Rs. {price}</h4>
+            <div className="bg-white border border-gray-200 rounded-lg p-5 flex flex-col justify-between h-full">
+                
+                <div>
+                    <span>{product.category}</span>
+                    <h3>{product.title}</h3>
+                    <p>{product.price}</p>
+                    <button onClick={()=>console.log(`Added ${product.title} to cart`)}>Add to Cart</button>
+                </div>
             </div>
         </>
     )
