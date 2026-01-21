@@ -50,18 +50,17 @@ function App() {
         <Navigation/>
         <Stats/>
         <ProductForm onAddProduct={handleAddProduct}/>
-        <ul>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg-grid-cols-4 gap-6">
           {
           Products.map(Product=>(
-            <li key={Product.id}>
-              <ProductDetails name={Product.name} 
+              <ProductDetails key={Product.id} name={Product.name} 
               description={Product.description} 
               price={Product.price} 
               unit={Product.unit}/>
-            </li>
           ))
         }
-        </ul>
+        </div>
+        
         <ProductListing/>
       </div>
 
